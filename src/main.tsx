@@ -1,6 +1,7 @@
 import {Component} from 'react-subx';
 import {StoreType, authorizeUri} from './store';
 import React from 'react';
+import {Spin} from 'antd';
 
 type PropsStore = {
   store: StoreType;
@@ -9,7 +10,7 @@ type PropsStore = {
 class App extends Component<PropsStore> {
   render() {
     const store = this.props.store;
-    return store.ready ? <Main store={store} /> : 'Loading...';
+    return store.ready ? <Main store={store} /> : <Spin size="large" />;
   }
 }
 
