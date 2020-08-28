@@ -27,20 +27,49 @@ if (code === null) {
 
 export type StoreType = {
   ready: boolean;
-  token?: TokenInfo;
+  loggedIn?: boolean;
   init: Function;
+  load: Function;
+  logout: Function;
+};
+
+const refreshToken = async () => {
+  try {
+    await rc.refresh();
+  } catch (e) {
+    // refresh failed
+    await localforage.clear();
+    window.location.reload(false);
+    return;
+  }
+  await localforage.setItem('token', rc.token);
 };
 
 const store = SubX.proxy<StoreType>({
   ready: false,
   async init() {
     if (code !== null) {
-      this.token = await rc.authorize({
+      await rc.authorize({
         code,
         redirect_uri: redirectUri,
         code_verifier: (await localforage.getItem('code_verifier')) as string,
       });
+      await localforage.setItem('token', rc.token);
+      window.location.href = redirectUri; // get rid of query string
     }
+  },
+  async load() {
+    const token = await localforage.getItem<TokenInfo>('token');
+    if (token !== null) {
+      rc.token = token;
+      await refreshToken();
+      setInterval(() => refreshToken(), 1800000); // every 30 minutes
+      this.loggedIn = true;
+    }
+  },
+  async logout() {
+    await localforage.clear();
+    window.location.reload(false);
   },
 });
 

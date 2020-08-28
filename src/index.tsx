@@ -12,5 +12,6 @@ ReactDOM.render(<App store={store} />, container);
 
 (async () => {
   await store.init();
+  await store.load();
   store.ready = true;
 })();

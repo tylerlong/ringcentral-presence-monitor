@@ -10,21 +10,15 @@ type PropsStore = {
 class App extends Component<PropsStore> {
   render() {
     const store = this.props.store;
-    return store.ready ? <Main store={store} /> : <Spin size="large" />;
-  }
-}
-
-class Main extends Component<PropsStore> {
-  render() {
-    const store = this.props.store;
-    return store.token ? <Token store={store} /> : <Login />;
-  }
-}
-
-class Token extends Component<PropsStore> {
-  render() {
-    const store = this.props.store;
-    return <pre>{JSON.stringify(store.token, null, 2)}</pre>;
+    return store.ready ? (
+      store.loggedIn ? (
+        <Main store={store} />
+      ) : (
+        <Login />
+      )
+    ) : (
+      <Spin size="large" />
+    );
   }
 }
 
@@ -36,6 +30,13 @@ class Login extends Component {
         Exchange{'"'}
       </a>
     );
+  }
+}
+
+class Main extends Component<PropsStore> {
+  render() {
+    const store = this.props.store;
+    return 'Logged in';
   }
 }
 
